@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <!-- heading unchanged -->
+  <div class="subscription-heading">
+    <h1>
+      Choose&nbsp;A<br>
+      <span>Subscription&nbsp;Plan</span>
+    </h1>
+  </div>
+
+  <form method="POST" action="{{ url_for('subscriptions') }}">
+
+    {# determine whether this is org or personal signup #}
+    {% set is_org = 'enterprise' in plans %}
+    {% if is_org %}
+      {% set order = ['free','pro','enterprise','basic'] %}
+    {% else %}
+      {% set order = ['free','pro','basic'] %}
+    {% endif %}
+
+    <div class="d-flex flex-wrap pricing-deck">
+
+      {% for plan in order if plan in plans %}
+        {# primary styling for blue cards #}
+        {% set primary = plan in ['pro','industrial','enterprise'] %}
+        {# featured = Pro always for personal; Pro+Enterprise for org #}
+        {% set featured = (not is_org and plan=='pro')
+                         or (is_org and plan in ['pro','enterprise']) %}
+
+        <div class="
+              pricing-card
+              {{ 'is-primary' if primary }}
+              {{ 'border-primary' if subscriber and subscriber.subscription_type==plan }}
+              {{ 'featured' if featured }}
+            ">
+
+          <!-- icon -->
+          <img class="plan-icon"
+               src="{{ url_for('static', filename='plans/' ~ plan ~ '.svg') }}"
+               alt="{{ plan }} icon">
+
+          <!-- title -->
+          <h5>{{ plan.upper() }}</h5>
+
+          <!-- description -->
+          <p>
+            {% if plan=='free' %}
+              Start free with essential tools.
+            {% elif plan in ['pro','industrial'] %}
+              Get the best with top features and support.
+            {% elif plan=='enterprise' %}
+              Enterprise-grade features with priority support.
+            {% else %}
+              Get basic features. Unlock advanced tools.
+            {% endif %}
+          </p>
+
+          <!-- select button -->
+          <button class="btn btn-select"
+                  type="submit" name="plan" value="{{ plan }}">
+            Select
+          </button>
+        </div>
+      {% endfor %}
+
+    </div>
+  </form>
+
+{% endblock %}
+

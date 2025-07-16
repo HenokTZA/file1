@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Choose a Subscription Plan</h2>
+<form method="POST" action="{{ url_for('subscriptions') }}">
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for plan in plans %}
+    <div class="col">
+      <div class="card h-100 {% if subscriber.subscription_type==plan %}border-primary{% endif %}">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ plan.title() }}</h5>
+          <p class="card-text">Details for {{ plan.title() }} plan…</p>
+          <button type="submit" name="plan" value="{{ plan }}"
+                  class="btn btn-outline-primary">
+            Select
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</form>
+{% endblock %}

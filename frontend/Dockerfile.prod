@@ -1,0 +1,25 @@
+# ───────────────────────────────────────────────────────────────────────────
+# 1) Build stage: produce optimized React static bundle
+# ───────────────────────────────────────────────────────────────────────────
+FROM node:18 AS builder
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# ───────────────────────────────────────────────────────────────────────────
+# 2) Serve stage: copy build into Caddy
+# ───────────────────────────────────────────────────────────────────────────
+FROM caddy:2-alpine
+
+# Caddyfile for serving the SPA
+COPY Caddyfile.frontend /etc/caddy/Caddyfile
+
+# Static files from React build
+COPY --from=builder /app/build /srv
+
+# expose container port 80 (internal only)
+EXPOSE 80

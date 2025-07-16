@@ -1,0 +1,14 @@
+/* custom.css */
+
+.ec-toolbar .ec-end .ec-button:nth-child(6) {
+  padding-right: 25px !important;
+}
+/* .ec-toolbar .ec-end .ec-button:nth-child(4) {
+  border-inline: none !important;
+  border-block: 2px solid #e0e0e0 !important;
+} */
+.ec-event.selected-event {
+  border: 2px solid #ff4444 !important; /* Use !important to override defaults */
+  box-shadow: 0 0 5px rgba(255, 68, 68, 0.6);
+  z-index: 10; /* Bring selected events to the front */
+}

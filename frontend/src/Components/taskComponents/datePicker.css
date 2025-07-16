@@ -1,0 +1,45 @@
+/* --- Add this to your datePicker.css file --- */
+
+/*
+  This targets the specific day element that react-datepicker marks as "today".
+*/
+.react-datepicker__day--today {
+  font-weight: bold;
+  background-color: #aedcff; /* A nice light blue */
+  border-radius: 50%; /* Makes the highlight a circle, which looks clean */
+  color: #000; /* Ensures the date number is readable */
+}
+
+/* 
+  Optional: Ensure that when "today" is also selected, it uses the selection color.
+  This rule has higher specificity, so it will override the "today" style.
+*/
+.react-datepicker__day--selected.react-datepicker__day--today,
+.react-datepicker__day--in-range.react-datepicker__day--today {
+  background-color: #aedcff; /* The default blue for selection */
+  border-radius: 50%;
+  color: white;
+}
+
+/* 
+  This is your existing style for dates with tasks.
+  The .react-datepicker__day--highlighted class will apply a dot *underneath* the date.
+  It works perfectly with the new "today" highlight.
+*/
+.react-datepicker__day--highlighted {
+  position: relative;
+  background-color: transparent !important; /* Keep the day background standard */
+  color: inherit !important; /* Keep the text color standard */
+}
+
+.react-datepicker__day--highlighted::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  background-color: #f59e0b; /* An orange dot, for example */
+  border-radius: 50%;
+}

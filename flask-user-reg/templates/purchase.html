@@ -1,0 +1,83 @@
+{# templates/purchase.html #}
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-6">
+    <!-- Checkout card -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Checkout</h4>
+      </div>
+
+      <div class="card-body">
+        <!-- Plan & price summary -->
+        <h5 class="card-title mb-2">{{ plan.title() }} Plan</h5>
+        <p class="text-muted mb-4">
+          You’re purchasing the <strong>{{ plan.title() }}</strong> plan for
+          <strong>${{ price }}</strong>.
+        </p>
+
+        <!-- Payment form -->
+        <form method="POST" action="{{ url_for('purchase', plan=plan) }}" novalidate>
+          <!-- Card number -->
+          <div class="mb-3">
+            <label for="card_number" class="form-label">Card Number</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-credit-card-2-front"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                id="card_number"
+                name="card_number"
+                maxlength="19"
+                placeholder="1234 5678 9012 3456"
+                required
+              >
+            </div>
+          </div>
+
+          <!-- Expiry & CVV -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="expiry" class="form-label">Expiry Date</label>
+              <input
+                type="text"
+                class="form-control"
+                id="expiry"
+                name="expiry"
+                placeholder="MM/YY"
+                required
+              >
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="cvv" class="form-label">CVV</label>
+              <input
+                type="text"
+                class="form-control"
+                id="cvv"
+                name="cvv"
+                placeholder="123"
+                required
+              >
+            </div>
+          </div>
+
+          <!-- Pay button -->
+          <div class="d-grid">
+            <button type="submit" class="btn btn-success btn-lg">
+              Pay ${{ price }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card-footer text-muted small">
+        Your payment information is encrypted and secure.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------
+  # Flask landing-page / subscription interface
+  # ----------------------------------------------------------------
+  user-reg:
+    build:
+      context: ./flask-user-reg
+      dockerfile: Dockerfile
+    ports:
+      - "8500:8080"                       # host:container (flask runs on 8080)
+    volumes:
+      - ./flask-user-reg:/app
+      - userreg-data:/app/subscribers.db
+    environment:
+      - SOCKETIO_URL=http://app:5000     # point at your Node service
+      - INTERNAL_SOCKET_SECRET=${INTERNAL_SOCKET_SECRET}
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+    depends_on:
+      app:
+        condition: service_started
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------
+  # React frontend (static build served by Caddy)
+  # ----------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ----------------------------------------------------------------
+  # Node / Express backend (MERN)
+  # ----------------------------------------------------------------
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    expose:
+      - "5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      - INTERNAL_SOCKET_SECRET=${INTERNAL_SOCKET_SECRET}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------
+  # Databases & cache
+  # ----------------------------------------------------------------
+  mongo:
+    image: mongo:8.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    command: ["--bind_ip_all"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------
+  # Caddy reverse-proxy + HTTPS
+  # ----------------------------------------------------------------
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - user-reg
+      - app
+      - frontend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  userreg-data:
+  mongo-data:
+  redis_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,10 @@
+{
+  # auto-HTTPS not used here (root-level Caddy handles TLS)
+}
+
+:80 {
+  root * /srv
+  encode gzip
+  file_server
+  try_files {path} /index.html
+}

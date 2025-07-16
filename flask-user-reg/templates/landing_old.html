@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid hero px-0">
+  <div class="row g-0 align-items-center">
+    <div class="col-12 col-md-5 offset-md-1 text-center text-md-start">
+      <h1 class="hero-title">
+        Welcome to<br>
+        <span class="hero-title-brand">Tasknitter</span>
+      </h1>
+      <p class="lead" style="font-weight: bold;">The one tool to rule them all !</p>
+      <p class="lead">Manage your tasks seamlessly—ideal for</p>
+      <p class="lead">personal projects or team collaboration.</p>
+      <a href="{{ url_for('register') }}" class="signup-btn me-2">Get Started</a>
+      <a href="{{ url_for('login') }}" class="text-decoration-none fw-semibold">Login</a>
+    </div>
+    <div class="col-12 col-md-6 text-center bell-col">
+      <img
+        src="{{ url_for('static', filename='images/main-img.png') }}"
+        alt="Task Master illustration"
+        class="hero-img"
+      >
+    </div>
+  </div>
+</div>
+
+<div class="product-cards">
+  <h2 class="section-title">Discover Our Product</h2>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for title, desc in [
+      ("Feature One","Quickly organize tasks and deadlines."),
+      ("Feature Two","Collaborate with your team in real-time."),
+      ("Feature Three","Get intelligent productivity insights.")
+    ] %}
+    <div class="col">
+      <div class="card h-100 card-glow">
+        <img
+          src="{{ url_for('static', filename='images/' ~ loop.index ~ '.jpg') }}"
+          class="card-img-top"
+          alt="{{ title }} screenshot"
+        >
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ title }}</h5>
+          <p class="card-text">{{ desc }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<div class="cta-section text-center my-5">
+  <h2>Ready to Boost Your Productivity?</h2>
+  <p>Join thousands of users who rely on Taskitter to stay organized.</p>
+  <a href="{{ url_for('register') }}"
+     class="signup-btn">Sign-Up Now</a>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{# === file: templates/register.html === #}
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center"
+     style="min-height: calc(100vh - 100px);">
+  <div class="card shadow-sm p-4 w-100" style="max-width: 480px;">
+    <h2 class="card-title mb-3 text-center">Create Your Account</h2>
+
+    <p class="text-center small">
+      Already have an account?
+      <a href="{{ url_for('login') }}">Login here</a>
+    </p>
+
+    <form method="POST" action="{{ url_for('register') }}" class="mt-4">
+
+      {# --- Account type toggle ----------------------------------------- #}
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Account Type</label>
+        <div class="btn-group d-flex" role="group">
+          <input type="radio" class="btn-check" name="account_type"
+                 id="personal" value="personal" autocomplete="off" checked>
+          <label class="btn btn-outline-primary flex-fill" for="personal">
+            Personal
+          </label>
+
+          <input type="radio" class="btn-check" name="account_type"
+                 id="organization" value="organization" autocomplete="off">
+          <label class="btn btn-outline-primary flex-fill" for="organization">
+            Organization
+          </label>
+        </div>
+      </div>
+
+      {# --- Name fields -------------------------------------------------- #}
+      <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+          <label for="first_name" class="form-label">First Name</label>
+          <input type="text" class="form-control" id="first_name"
+                 name="first_name" required>
+        </div>
+        <div class="col-sm-6">
+          <label for="last_name" class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="last_name"
+                 name="last_name" required>
+        </div>
+      </div>
+
+      {# --- Contact and address ----------------------------------------- #}
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email"
+               name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="telephone" class="form-label">Telephone</label>
+        <input type="tel" class="form-control" id="telephone"
+               name="telephone" required>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        <input type="text" class="form-control" id="address"
+               name="address" required>
+      </div>
+
+      {# --- Organization field (hidden unless toggled) ------------------ #}
+      <div id="org-fields" class="mb-3" style="display: none;">
+        <label for="organization_name" class="form-label">Organization Name</label>
+        <input type="text" class="form-control" id="organization_name"
+               name="organization_name">
+      </div>
+
+      {# --- Password with eye icon -------------------------------------- #}
+      <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+
+        <div class="input-group">
+          <input type="password" class="form-control" id="password"
+                 name="password" required
+                 pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}"
+                 title="Must be at least 8 characters, include uppercase, lowercase, number, and symbol.">
+          <button class="btn btn-outline-secondary"
+                  type="button"
+                  id="togglePassword"
+                  aria-label="Show password">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+
+        <div class="form-text text-muted">
+          Password must be at least 8 characters and include uppercase,
+          lowercase, a number, and a symbol.
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+  </div>
+</div>
+
+{# ---------------------------------------------------------------------- #}
+{# Scripts specific to this page                                          #}
+{# ---------------------------------------------------------------------- #}
+<script>
+  /* 1. Show or hide the organization name field */
+  const orgFields = document.getElementById('org-fields');
+  document.querySelectorAll('input[name="account_type"]').forEach(radio => {
+    radio.addEventListener('change', e => {
+      orgFields.style.display =
+        (e.target.value === 'organization') ? 'block' : 'none';
+    });
+  });
+  /* Respect default checked state on load */
+  window.addEventListener('DOMContentLoaded', () => {
+    const sel = document.querySelector('input[name="account_type"]:checked');
+    orgFields.style.display =
+      (sel.value === 'organization') ? 'block' : 'none';
+  });
+
+  /* 2. Toggle password visibility */
+  const pwdInput  = document.getElementById('password');
+  const toggleBtn = document.getElementById('togglePassword');
+  toggleBtn.addEventListener('click', () => {
+    const isHidden = pwdInput.type === 'password';
+    pwdInput.type  = isHidden ? 'text' : 'password';
+    toggleBtn.innerHTML = isHidden
+      ? '<i class="bi bi-eye-slash"></i>'
+      : '<i class="bi bi-eye"></i>';
+    toggleBtn.setAttribute(
+      'aria-label',
+      isHidden ? 'Hide password' : 'Show password'
+    );
+  });
+</script>
+{% endblock %}
+

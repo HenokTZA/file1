@@ -1,0 +1,13 @@
+# Dockerfile.dev
+
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+EXPOSE 3000
+ENV GENERATE_SERVICE_WORKER=false
+CMD ["npm", "start"] # Run with live reload in development

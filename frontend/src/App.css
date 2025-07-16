@@ -1,0 +1,15 @@
+/* styles.css */
+.event-red {
+  background-color: red; /* Set background color for red events */
+  color: white; /* Set text color for red events */
+}
+
+.event-blue {
+  background-color: blue; /* Set background color for blue events */
+  color: white; /* Set text color for blue events */
+}
+
+.event-green {
+  background-color: green; /* Set background color for green events */
+  color: white; /* Set text color for green events */
+}

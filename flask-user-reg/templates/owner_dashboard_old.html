@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Owner Control Panel</h2>
+
+{# ===== Row 1 –– Account-type totals ===== #}
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm text-center border-0">
+      <div class="card-body">
+        <h5 class="card-title text-uppercase fw-bold text-primary mb-0">
+          Personal Accounts
+        </h5>
+        <span class="display-5 fw-semibold">{{ stats.personal_total }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm text-center border-0">
+      <div class="card-body">
+        <h5 class="card-title text-uppercase fw-bold text-success mb-0">
+          Organization Accounts
+        </h5>
+        <span class="display-5 fw-semibold">{{ stats.org_total }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ===== Row 2 –– Personal plan breakdown ===== #}
+<h4 class="mt-5 mb-3">Personal Plans</h4>
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+  {% set p = stats.personal %}
+  {% for plan, label, color in
+      [('free','Free','#6c757d'),
+       ('basic','Basic','#0d6efd'),
+       ('pro','Pro','#6610f2'),
+       ('none','None','#adb5bd')] %}
+    <div class="col">
+      <div class="card text-center border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold" style="color:{{ color }}">{{ label }}</h6>
+          <span class="fs-3 fw-bold">{{ p[plan] }}</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{# ===== Row 3 –– Organization plan breakdown ===== #}
+<h4 class="mt-5 mb-3">Organization Plans</h4>
+<div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
+  {% set o = stats.organization %}
+  {% for plan, label, color in
+      [('free','Free','#6c757d'),
+       ('basic','Basic','#0d6efd'),
+       ('pro','Pro','#6610f2'),
+       ('enterprise','Enterprise','#198754'),
+       ('none','None','#adb5bd')] %}
+    <div class="col">
+      <div class="card text-center border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold" style="color:{{ color }}">{{ label }}</h6>
+          <span class="fs-3 fw-bold">{{ o[plan] }}</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{# ===== Existing subscriber table (unchanged) ===== #}
+<table class="table table-striped table-bordered align-middle">
+  <thead class="table-dark">
+    <tr>
+      <th>#</th><th>Name</th><th>Email</th><th>Account Type</th>
+      <th>Subscription</th><th>Max Users</th><th>Max Resources</th><th>Joined</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in subscribers %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ s.first_name }} {{ s.last_name }}</td>
+        <td>{{ s.email }}</td>
+        <td>{{ s.account_type.title() }}</td>
+        <td>{{ (s.subscription_type or '—').title() }}</td>
+        <td>{{ s.max_users or '—' }}</td>
+        <td>{{ s.max_resources or '—' }}</td>
+        <td>{{ s.created_at.strftime('%Y-%m-%d') }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
+
+

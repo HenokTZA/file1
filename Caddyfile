@@ -1,0 +1,42 @@
+{
+  # your admin e-mail for Let’s Encrypt
+  email you@yourdomain.com
+  acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+# ────────────────────────────────────────────────────────────────
+# Redirect all HTTP → HTTPS
+# ────────────────────────────────────────────────────────────────
+http://tasknitter.com, http://www.tasknitter.com {
+  redir https://{host}{uri} permanent
+}
+http://app.tasknitter.com {
+  redir https://{host}{uri} permanent
+}
+
+# ────────────────────────────────────────────────────────────────
+# 1) Flask landing page on the root domain
+# ────────────────────────────────────────────────────────────────
+tasknitter.com, www.tasknitter.com {
+  reverse_proxy user-reg:8000
+
+  encode gzip
+  header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+}
+
+# ────────────────────────────────────────────────────────────────
+# 2) MERN app on the "app" subdomain
+# ────────────────────────────────────────────────────────────────
+app.tasknitter.com {
+  # proxy API, Socket.IO, & raw WS → Node backend
+  @api_ws {
+    path /api/* /socket.io* /ws*
+  }
+  reverse_proxy @api_ws app:5000
+
+  # everything else → static React build (frontend container)
+  reverse_proxy /* frontend:80
+
+  encode gzip
+  header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+}

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tasknitter</title>
+
+  <!-- Bootstrap + Google Font -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap"
+        rel="stylesheet">
+  <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- Page-specific styles -->
+  <style>
+    body {
+      background: #f8f9fa;
+      font-family: 'Roboto', sans-serif;
+      padding-top: 70px;          /* leave room for fixed navbar */
+    }
+    .navbar {
+      height: 60px;
+      box-shadow:
+        0 2px 4px  rgba(88,134,209,.3),
+        0 4px 12px rgba(88,134,209,.2);
+    }
+
+    /* ====== Hero & Subscription (kept from your file) ====== */
+    .hero        { overflow:visible; padding-bottom:4rem; }
+    .hero-img    { max-width:100%; margin-right:-5%; pointer-events:none; }
+    .hero-title  { font:700 2.75rem/1.1 'Roboto',sans-serif; margin-bottom:1rem; }
+    .hero-title-brand { font:700 3.5rem/1 'Roboto',sans-serif; color:#5886D1; }
+    .cta-section { background:#d5e5fdaa; padding:40px 0; text-align:center; margin-top:60px; }
+
+    /* Card / pricing styles (unchanged) */
+    .pricing-deck   { gap:1.5rem; justify-content:center; }
+    .pricing-card   { position:relative; width:165px; padding:3.5rem 1rem 1.75rem;
+                      border-radius:12px; border:2px solid rgba(88,134,209,.15);
+                      background:#EDF4FF; text-align:center; font-family:'Lexend',sans-serif;
+                      transition:transform .15s ease; }
+    .pricing-card:hover      { transform:translateY(-4px); }
+    .pricing-card.is-primary { background:linear-gradient(180deg,#3B8AFF 0%,#4C94DD 100%);
+                                border:none; color:#fff; }
+    .pricing-card.is-featured{ width:190px; padding-top:5rem; padding-bottom:3rem;
+                                transform:translateY(-6px); z-index:1; }
+    .pricing-card.featured   { transform-origin:center top; transform:scale(1.07); z-index:2; }
+    .pricing-card.featured:hover{ transform:scale(1.07) translateY(-4px); }
+
+    /* Utility buttons */
+    .signup-btn      { background:#5886D1; color:#fff; border:none; padding:.75rem 2rem;
+                       font-size:1.125rem; font-weight:600; border-radius:50px; transition:.2s; }
+    .signup-btn:hover{ background:rgba(88,134,209,.8); color:#fff; }
+  </style>
+</head>
+
+<body>
+
+<!-- ================= Navbar ================= -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top border-bottom">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('landing') }}">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           alt="Tasknitter Logo"
+           width="50" height="auto"
+           class="d-inline-block align-text-top me-2">
+      Tasknitter
+    </a>
+
+    <!-- RIGHT-ALIGNED BUTTON GROUP -->
+    <div class="d-flex align-items-center">
+      {# ───────── OWNER SESSION ───────── #}
+      {% if session.get('is_owner') %}
+          {# Show Owner-Panel button only if we’re NOT already on that page #}
+          {% if request.endpoint != 'owner_dashboard' %}
+            <a class="btn btn-warning me-2"
+               href="{{ url_for('owner_dashboard') }}">Owner&nbsp;Panel</a>
+          {% endif %}
+
+          <a class="btn btn-danger"
+             href="{{ url_for('logout') }}">Logout</a>
+
+      {# ───────── SUBSCRIBER SESSION ───────── #}
+      {% elif subscriber %}
+          <a class="btn btn-outline-primary me-2"
+             href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a class="btn btn-danger"
+             href="{{ url_for('logout') }}">Logout</a>
+
+      {# ───────── ANONYMOUS VISITOR ───────── #}
+      {% else %}
+          <a class="btn btn-outline-primary me-2"
+             href="{{ url_for('login') }}">Login</a>
+          <a class="btn btn-primary"
+             href="{{ url_for('register') }}">Register</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+<!-- ================ /Navbar ================ -->
+
+
+<!-- ================= Flash messages + content ================= -->
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'success' if cat == 'success' else 'danger' }} mt-3">
+          {{ msg }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<!-- ================= Footer ================= -->
+<footer class="text-center mt-5 py-4 border-top">
+  <p>&copy; 2025 Tasknitter. All rights reserved.</p>
+</footer>
+
+<!-- Bootstrap JS bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
