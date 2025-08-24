@@ -1,544 +1,263 @@
-Task Management Application
-
-A comprehensive task management system with full user access control, calendar-based task management, and offline support. This application allows users to create, update, and delete tasks across multiple views (daily, weekly, monthly, yearly, and list). It also includes advanced features like resource management, image uploads, and filtering.
-
-Key Features:
-
-User Authentication and Roles:
-
-Admin: Full access to add, delete, and update resources (facilities, machines, materials, and tools) for tasks.
-
-Other Users: Create, update, and delete tasks with restricted access to resources.
-
-Task Management:
-
-Task Creation: Create tasks by clicking empty spaces in the calendar, selecting a date range, or using dedicated buttons.
-
-Task Updates: Update tasks with details like start/end times, status, and images (for visual context).
-
-Task Deletion: Delete tasks seamlessly from all views.
-
-Calendar UI:
-
-Multiple Views: Manage tasks in daily, weekly, monthly, yearly, and list views.
-
-Drag-and-Drop: Easily reschedule tasks by dragging them across the calendar.
-
-Resource Management:
-
-Admins can manage resources (facilities, machines, materials, and tools) for each task.
-
-Users can view assigned resources but cannot modify them.
-
-Image Uploads:
-
-Attach images to tasks for better visualization and context.
-
-Images are stored and displayed within the task update field.
-
-Offline Support:
-
-Work seamlessly without an internet connection. Changes are synced when the app goes online.
-
-Filtering:
-
-Filter tasks by date, status, or resources for better organization and visibility.
-
-Technologies Used:
-
-Frontend: React, Redux, Event calender library, Tailwind css.
-
-Backend: Node.js, Express, CouchDb .
-
-Authentication: JWT (JSON Web Tokens) for secure user authentication.
-
-Offline Support: Service Workers and PouchDb.
-
-# installation guide
-
-Prerequisites
-
-Before starting, ensure you have the following installed on your system:
-
-Docker: Install Docker
-
-Docker Compose: Included with Docker Desktop or install it separately.
-
-Git: Install Git
-
-Node.js and npm (for local development without Docker): Install Node.js
-   
-   # Project Setup
-
-1. Clone the Repository
-
-Clone project repository from GitHub:
-
-git clone https://github.com/Procon-system/system_managemnt_tool.git
-
-2.Environment Variables
-
-Backend
-
-Navigate to the backend directory.
-
-Create a .env file if it doesn't exist:
-
-touch .env   # add .env code to this file
-
-Frontend
-
-Navigate to the frontend directory.
-
-Create a .env file:
-
-touch .env   # add .env code to this file
-
-3.Build and Run the Project
-
-Build the Docker images:
- 
-docker compose up --build
-
-Start the services:
-
-docker compose up
-
-Access the application:
-
-Frontend: http://localhost:3000
-
-Backend: http://localhost:5000
-
-4.Stopping the Services
-
-To stop the services, use:
-
-docker compose down
-
-Troubleshooting
-
-Port Conflicts:
-
-Ensure ports 3000, 5000, and 27017 are not in use.
-
-MongoDB Connection Issues:
-
-Check the MONGO_URI in your .env file.
-
-Rebuild Containers:
-
-If changes aren’t reflected, rebuild the containers:
-
-docker compose up --build
-
-5.After any new changes to the code:
-
-Run the following command to fetch the latest changes from the repository.
-
-git pull 
-
-Check for the .env file:
-
-If the .env file is not present, create it and add the environment variables.
-
-Rebuild Docker containers:
-
-Run the following commands to ensure the changes are reflected in the Docker containers:
-
-docker compose down
-
-docker compose up --build
-
-If no code changes have been made:
-
-To simply restart the application, run:
-
-docker compose up
-
-# Full Guide: Setting Up WSL and Installing the Task Manager App online
-
-## Step 1: Install WSL and Ubuntu
-
-1. **Enable WSL** (Windows Subsystem for Linux) on Windows:
-   - Open **PowerShell as Administrator** and run:
-     ```powershell
-     wsl --install -d Ubuntu
-     ```
-   - If WSL is already installed, update it with:
-     ```powershell
-     wsl --update
-     ```
-
-2. **Restart your system** and open Ubuntu from the Start Menu.
-
-3. **Set up your Ubuntu user** (you’ll be prompted to create a username and password).
+# CSMS Authentication & User API
+
+A concise, production‑ready reference for authenticating users in the CSMS backend and retrieving the current user profile.
+
+> **Base URL**
+>
+> ```text
+> http://147.93.127.215:8000
+> ```
+>
+> All endpoints below are prefixed with `/api`.
 
 ---
 
-## Step 2: Update System Packages
+## Quick Start (Windows CMD)
 
-Once inside WSL (Ubuntu), update package lists and upgrade:
-```bash
-sudo apt update && sudo apt upgrade -y
+```bat
+:: Base URL
+set BASE=http://147.93.127.215:8000
+```
+
+### 1) Sign up
+
+```bat
+curl -s -X POST "%BASE%/api/auth/signup/" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"henoka\",\"email\":\"test1@example.com\",\"full_name\":\"Henoka Tadelea\",\"password\":\"MyP@ssw0rd\",\"password2\":\"MyP@ssw0rd\",\"role\":\"user\"}"
+```
+
+Another example (super admin):
+
+```bat
+curl -s -X POST "%BASE%/api/auth/signup/" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"henokaa\",\"email\":\"test2@example.com\",\"full_name\":\"Henokaa Tadeleaa\",\"password\":\"MyP@ssw0rd\",\"password2\":\"MyP@ssw0rd\",\"role\":\"super_admin\"}"
+```
+
+**Success (example):**
+```json
+{"detail":"ok"}
+```
+
+### 2) Log in (get JWT pair)
+
+```bat
+curl -s -X POST "%BASE%/api/auth/login/" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"henokaa\",\"password\":\"MyP@ssw0rd\"}"
+```
+
+**Success (example):**
+```json
+{
+  "refresh": "<REFRESH_JWT>",
+  "access": "<ACCESS_JWT>",
+  "role":"super_admin"
+}
+```
+
+Save tokens in env vars for later calls:
+
+```bat
+set ACCESS=<ACCESS_JWT>
+set REFRESH=<REFRESH_JWT>
+```
+
+### 3) Get current user
+
+```bat
+curl "%BASE%/api/me/" -H "Authorization: Bearer %ACCESS%"
+```
+
+**Success (example):**
+```json
+{
+  "id": 48,
+  "email": "test2@example.com",
+  "role": "super_admin",
+  "tenant_id": 23,
+  "tenant_ws": "ws://147.93.127.215:8000/api/v16/85f8e0c7dc075c57b0f2141bc1dabe45"
+}
+```
+
+### 4) Refresh access token
+
+```bat
+curl -s -X POST "%BASE%/api/auth/refresh/" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"refresh\":\"%REFRESH%\"}"
+```
+
+**Success (example):**
+```json
+{ "access": "<NEW_ACCESS_JWT>" }
+```
+
+### 5) Request password reset (email is sent with reset link)
+
+```bat
+curl -s -X POST "%BASE%/api/auth/password/reset/" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\":\"ydidyatadele99@gmail.com\"}"
+```
+
+**Success (example):**
+```json
+{"detail":"Password reset e-mail sent"}
+```
+
+Email contains a link like:
+```
+http://147.93.127.215:5173/reset-password/<UID>/<TOKEN>
+```
+
+### 6) Confirm password reset
+
+After opening the link above and choosing a new password, call:
+
+```bat
+curl -s -X POST "%BASE%/api/auth/password/reset/confirm/" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"uid\":\"<UID>\",\"token\":\"<TOKEN>\",\"new_password\":\"<NEW_PASSWORD>\"}"
+```
+
+**Success (example):**
+```json
+{"detail":"Password has been reset"}
+```
+
+### 7) Log out (invalidate tokens / end session)
+
+```bat
+curl -s -X POST "%BASE%/api/auth/logout/" ^
+  -H "Authorization: Bearer %ACCESS%" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"refresh\":\"%REFRESH%\"}"
+```
+
+**Success (example):**
+```json
+{"detail":"Logout successful"}
 ```
 
 ---
 
-## Step 3: Install Docker and Docker Compose
+## Endpoint Reference
 
-Run the following commands to install **Docker** and **Docker Compose**:
-```bash
-sudo apt install -y docker.io docker-compose
+| Path                                  | Method | Description                                   | Auth Needed | Notes            |
+|---------------------------------------|--------|-----------------------------------------------|-------------|------------------|
+| `/api/auth/signup/`                   | POST   | Create a user account                          | No          |                  |
+| `/api/auth/login/`                    | POST   | Obtain JWT access/refresh pair                 | No          |                  |
+| `/api/auth/refresh/`                  | POST   | Refresh access token                           | No*         | Uses refresh JWT |
+| `/api/auth/password/reset/`           | POST   | Request password reset email                   | No          |                  |
+| `/api/auth/password/reset/confirm/`   | POST   | Confirm reset with UID + token + new password  | No          |                  |
+| `/api/auth/logout/`                   | POST   | Log out (server-side invalidate)               | Yes         | Send access + refresh |
+| `/api/me/`                            | GET    | Get current user profile                       | Yes         | Send access JWT  |
+
+\* *No user auth header is required for `/auth/refresh/`, but the **refresh token** is mandatory in the JSON body.*
+
+---
+
+## Authentication Model
+
+- **JWT Access Token**: short‑lived; used in the `Authorization` header.
+  - Example: `Authorization: Bearer <ACCESS_JWT>`
+- **JWT Refresh Token**: longer‑lived; used to obtain a new access token via `/auth/refresh/`.
+- **Logout** requires both:
+  - `Authorization: Bearer <ACCESS_JWT>` header, and
+  - JSON body `{ "refresh": "<REFRESH_JWT>" }` to invalidate the refresh token on the server.
+
+> **Never** expose tokens in URLs or client‑side logs. Store refresh tokens securely and rotate access tokens regularly.
+
+---
+
+## Example Responses
+
+### Login
+```json
+{
+  "refresh":"<REFRESH_JWT>",
+  "access":"<ACCESS_JWT>",
+  "role":"super_admin"
+}
 ```
 
-Enable Docker service:
-```bash
-sudo systemctl enable --now docker
+### Refresh
+```json
+{
+  "access":"<NEW_ACCESS_JWT>"
+}
 ```
 
-Add your user to the Docker group (to avoid using `sudo` every time):
-```bash
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-Verify Docker is working:
-```bash
-docker --version
-docker run hello-world
+### Me
+```json
+{
+  "id":48,
+  "email":"test2@example.com",
+  "role":"super_admin",
+  "tenant_id":23,
+  "tenant_ws":"ws://147.93.127.215:8000/api/v16/85f8e0c7dc075c57b0f2141bc1dabe45"
+}
 ```
 
 ---
 
-## Step 4: Clone Your Task Manager App Repository
+## cURL (bash) equivalents
 
-clone it:
 ```bash
-git clone https://github.com/Procon-system/system_managemnt_tool.git
-cd task-manager-app
+BASE="http://147.93.127.215:8000"
+
+curl -s -X POST "$BASE/api/auth/login/" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"henokaa","password":"MyP@ssw0rd"}'
 ```
 
-If your project is local, ensure the `docker-compose.yml` file is in the project directory.
+Add the header when calling authenticated endpoints:
+```bash
+curl "$BASE/api/me/" -H "Authorization: Bearer $ACCESS"
+```
 
 ---
 
-## Step 5: Run the Installation Script
+## Postman Tips
 
-Now, run the **installation script** to automate everything:
-
-1. **Create the script file**:
-   ```bash
-   nano install_online.sh
+1. **Create an Environment** with `BASE`, `ACCESS`, and `REFRESH` variables.
+2. **Login** request: save `access` to `ACCESS` and `refresh` to `REFRESH` via a **Tests** script:
+   ```js
+   let data = pm.response.json();
+   pm.environment.set("ACCESS", data.access);
+   pm.environment.set("REFRESH", data.refresh);
    ```
-
-2. **Copy and paste the script below into the file**:
-   ```bash
-   #!/bin/bash
-   
-   # Function to check command success
-   check_success() {
-     if [ $? -ne 0 ]; then
-       echo "Error: $1 failed. Exiting."
-       exit 1
-     fi
-   }
-   
-   echo "Starting online installation..."
-   
-   # Step 1: Update system
-   echo "Updating system packages..."
-   sudo apt update && sudo apt upgrade -y
-   check_success "System update"
-   
-   # Step 2: Install Docker & Docker Compose
-   echo "Installing Docker and Docker Compose..."
-   sudo apt install -y docker.io docker-compose
-   check_success "Docker installation"
-   
-   # Step 3: Start and enable Docker service
-   echo "Starting and enabling Docker service..."
-   sudo systemctl enable --now docker
-   check_success "Starting Docker service"
-   
-   # Step 4: Run Docker Compose
-   echo "Starting application with Docker Compose..."
-   docker-compose up -d
-   check_success "Starting Docker Compose services"
-   
-   # Verify installation
-   echo "Verifying running containers..."
-   docker ps
-   
-   echo "Online installation completed successfully!"
-   ```
-
-3. **Save and exit** (press `CTRL+X`, then `Y`, then `Enter`).
-
-4. **Make the script executable**:
-   ```bash
-   chmod +x install_online.sh
-   ```
-
-5. **Run the script**:
-   ```bash
-   ./install_online.sh
-   ```
+3. **Authenticated requests**: set an **Authorization** header with `Bearer {{ACCESS}}`.
+4. **Token refresh**: call `/auth/refresh/` with body `{ "refresh": "{{REFRESH}}" }` and update `ACCESS` in the **Tests** tab.
+5. **Logout**: send both the `Authorization: Bearer {{ACCESS}}` header and the JSON body `{ "refresh": "{{REFRESH}}" }`.
 
 ---
 
-## Step 6: Verify Everything is Running
+## Error Handling (common HTTP codes)
 
-To check if all containers are running:
-```bash
-docker ps
-```
+- `400 Bad Request` – malformed input or validation error.
+- `401 Unauthorized` – missing/invalid access token.
+- `403 Forbidden` – authenticated but not permitted for the action.
+- `404 Not Found` – endpoint or resource not found.
+- `429 Too Many Requests` – client exceeded rate limits.
+- `500 Internal Server Error` – unexpected server error.
 
-If you need to restart the app later:
-```bash
-docker-compose down
-```
-```bash
-docker-compose up -d
-```
-
-To check application logs:
-```bash
-docker-compose logs -f
-```
+Include the response body when reporting issues—especially for 4xx errors.
 
 ---
 
-## Conclusion
+## Security Checklist
 
-🎉 Your Task Manager app should now be running in **WSL using Docker Compose**!
-
-
-# Full Guide: Setting Up WSL and Installing the Task Manager App (Offline)
-
-## Step 1: Install WSL and Ubuntu
-
-1. **Enable WSL** on Windows:
-   - Open **PowerShell as Administrator** and run:
-     ```powershell
-     wsl --install -d Ubuntu
-     ```
-   - If WSL is already installed, update it with:
-     ```powershell
-     wsl --update
-     ```
-
-2. **Restart your system** and open Ubuntu from the Start Menu.
-
-3. **Set up your Ubuntu user** (you’ll be prompted to create a username and password).
+- Always use HTTPS in production.
+- Keep access tokens short‑lived; refresh to obtain new ones as needed.
+- Store refresh tokens in an http‑only, secure storage layer on trusted clients/servers.
+- Revoke refresh tokens on logout and upon suspicious activity.
+- Rotate credentials and monitor audit logs.
 
 ---
 
-## Step 2: Prepare Offline Installation Files
+## Changelog
 
-Since this is an **offline installation**, ensure you have the necessary files downloaded beforehand and transferred to your WSL environment:
-
-1. **Required `.deb` packages** for Docker, Node.js, Redis, and CouchDB.
-2. **Pre-downloaded Docker images** as `.tar` files.
-3. **Node.js dependencies** as a `.tgz` package (if applicable).
-4. **Your `docker-compose.yml` and project files**.
-
-Create the following directories in WSL and place the files inside:
-```bash
-mkdir -p ~/offline-packages ~/docker-images
-```
-Transfer the files to these directories.
-
----
-
-## Step 3: Run the Offline Installation Script
-
-1. **Create the script file**:
-   ```bash
-   nano install_offline.sh
-   ```
-
-2. **Copy and paste the script below into the file**:
-   ```bash
-   #!/bin/bash
-   
-   # Define directories
-   PACKAGE_DIR="$(pwd)/offline-packages"
-   DOCKER_IMAGES_DIR="$(pwd)/docker-images"
-   
-   # Function to check command success
-   check_success() {
-     if [ $? -ne 0 ]; then
-       echo "Error: $1 failed. Exiting."
-       exit 1
-     fi
-   }
-   
-   echo "Starting offline installation..."
-   
-   # Step 1: Install .deb packages
-   echo "Installing required packages..."
-   sudo dpkg -i $PACKAGE_DIR/*.deb
-   check_success "Installing .deb packages"
-   
-   # Fix any broken dependencies
-   echo "Fixing broken dependencies..."
-   sudo apt --fix-broken install -y
-   check_success "Fixing dependencies"
-   
-   # Step 2: Load Docker images
-   echo "Loading Docker images..."
-   for image in $DOCKER_IMAGES_DIR/*.tar; do
-     docker load -i "$image"
-     check_success "Loading Docker image $image"
-   done
-   
-   # Step 3: Start services using Docker Compose
-   echo "Starting application with Docker Compose..."
-   docker-compose up -d
-   check_success "Starting Docker Compose services"
-   
-   # Verify installation
-   echo "Verifying installation..."
-   docker ps
-   node -v
-   npm -v
-   redis-server --version
-   couchdb -V
-   
-   echo "Offline installation completed successfully!"
-   ```
-
-3. **Save and exit** (press `CTRL+X`, then `Y`, then `Enter`).
-
-4. **Make the script executable**:
-   ```bash
-   chmod +x install_offline.sh
-   ```
-
-5. **Run the script**:
-   ```bash
-   ./install_offline.sh
-   ```
-
----
-
-## Step 4: Verify Everything is Running
-
-To check if all containers are running:
-```bash
-docker ps
-```
-
-If you need to restart the app later:
-```bash
-docker-compose down
-```
-```bash
-docker-compose up -d
-```
-
-To check application logs:
-```bash
-docker-compose logs -f
-```
-
----
-
-## Conclusion
-
-🎉 Your Task Manager app should now be running **offline in WSL using Docker Compose**! 
-
-# Service_managemnt_tool description
-The service Management tool should be a platform were a Person is able to see move (move in Time by drag and drop) setup and distribute service Tasks from one or Multiple Machines. 
-He should be able to distribute the Tasks to one ore Multiple Human or Technical resources such service Personal or needed Materials or Tools for the service etc. 
-
-The Service Personal should be able to Receive (view it in the App) and access the Task description and fulfill the Task and Flag it to “done” or “not possible”. In case of done the Task will be 
-moved to a History List and can be reviewed from the service Manager. In case of not possible it will stay in the Task list and can be new distributed or modified. Both Manager and Service personal 
-should be able to add Notes and Pictures to the Task until it is moved to the History list.
-The App should be able to receive Task Objects from a Machine. This Objects will be transferred using MQTT to the App.
-The Object of the Machine Task has the same structure like the objects that will be setup in the Application and will be further handled as a new setup Tasks.
-The Application should have a access Management were Manager and service personal need to  sign up (by admin) and sign in. This access management should have 5 login level (set able for the person by admin) 
-this login level later will be used to view dedicated content in the App for example the Manager should have the right to edit new Tasks the Service Personal should be not able to do so etc.
-
-The App should have a Warning Alarming structure and send mails ore SMS for information to the setup receiver.
-
-The basis for this will be a Calendar structure because all Tasks are equal to Calendar events and will be handle like this.
-
-App Structure
-
-The app should be able to run under Linux OS using a X86 device as a Server component or run on a cloud server setup.
-The App will be finally transferred into a Docker file for easy setup on new HW or Cloud devices.
-
-Software Sources:
-JavaScript, CSS, HTML, MQTT, nodes, xx as needed
-
-Back end:
-Nodes will be the host and interpreter for the Script codes
-
-Front end:
-The Graphical Interface will be displayed using a Browser on a Mobil or desktop Device in the same Network  
-
-Development Framework is not specified and after discussion with Project leader free of Joyce.
-
-
-The Calendar App from Github https://github.com/vkurko/calendar?tab=readme-ov-file
-
-mind be helpful to save development time but it is not mandatory to use it. 
-Styles and design can be free selected (nice ones please)
-
-Features:
-
-Receive Tasks from a Machine and show them on the Calendar Platform 
-Setup manual additional Tasks by clicking on a free Time slot on the Calendar
-by clicking on a free Time slot open the editor form for a Task
-Tasks must be movable in the Calendar Timeline by Drag and drop
-open the Task by clicking on the Task for review or modification
-Show a preview of the Task on the Calendar Object
-Set able time before the Task time color of the task switch to Yellow
-If Task time is reached Task color switch to Red
-if Alarm/warning is setup the App send a SMS or mail
-Task can be flagged by pushing a button to done or not done
-Task can be assigned to one or more service personal
-History list for done Tasks
-use management with 5 access level
-Editable Technical resources list Tool, costs
-Editable Human resources list Person, work hours, costs 
-Block of resources or notice of double use 
-
-Development Steps
-
-1. Create a workable node environment
-- Download and install the Calendar Application
-- create a docker file of this setup for testing and easy transfer of the progress
-- Setup a Task object and GUI Form for creating new task
-- setup persistent Database to store the Tasks
-- setup login Page and user Management
-- setup Persistent user Database
-- create Tool Database 
-- create Material Database
-- create color handling of the Task green/yellow/red
-----------Tools, Task, Material, user, can be Handled in one Database but different Array------
-
-- send run able docker file --
-
-2. setup MQTT communication and exchange of Task Object
-- setup distribution of the Task to the dedicated Personal
-- setup Historical view can be generated from the main Database
-- use Access level 5 for admin purpose (access to all features)
-- Access level 1 for just view, 2 for service People, 3 for Manager
-
-- send run able docker file --
-
-
-
-3. create the form for setup human resources
-- create Form for setup Tools
-- create Form for setup Materials
-- create Picture handling and saving to the Task
-
-- send run able docker file --
-
-4. Create Alarming
-- create Form for mail editing
-- create Form for SMS editing
+- **v1.0.0** – Initial public documentation for CSMS Auth & User API.
